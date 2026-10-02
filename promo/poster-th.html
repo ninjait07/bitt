@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --brand-a:#546BFA; --brand-b:#8538D9;
+    --down:#408CFF; --seed:#2EC770; --pause:#FAAD2E; --done:#29B8A3; --meta:#A36BFA;
+    --ink:#ffffff; --dim:rgba(255,255,255,.62); --dimmer:rgba(255,255,255,.40);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{
+    width:1638px;height:2048px;overflow:hidden;
+    font-family:'IBM Plex Sans Thai','Inter',-apple-system,sans-serif;
+    color:var(--ink);
+    background:
+      radial-gradient(1200px 900px at 88% 8%, rgba(84,107,250,.30), transparent 60%),
+      radial-gradient(1000px 900px at 10% 30%, rgba(133,56,217,.26), transparent 62%),
+      radial-gradient(900px 700px at 70% 95%, rgba(41,184,163,.16), transparent 60%),
+      linear-gradient(160deg,#0d1430 0%,#171a3d 38%,#241a44 68%,#141b36 100%);
+    padding:62px 74px 34px;display:flex;flex-direction:column;
+  }
+  .row{display:flex;align-items:center}
+
+  /* ---- header ---- */
+  header{display:flex;align-items:center;gap:22px;margin-bottom:40px}
+  .mark{width:84px;height:84px;border-radius:21px;background:linear-gradient(145deg,var(--brand-a),var(--brand-b));
+        display:flex;align-items:center;justify-content:center;box-shadow:0 14px 40px rgba(84,107,250,.42)}
+  .mark svg{width:52px;height:52px}
+  .wordmark{font-family:'Inter',sans-serif;font-size:54px;font-weight:800;letter-spacing:-1.5px;line-height:1}
+  .sub{font-size:23px;color:var(--dim);margin-top:9px}
+  .sub b{color:rgba(255,255,255,.85);font-weight:600}
+
+  /* ---- hero ---- */
+  .eyebrow{font-size:29px;font-weight:600;color:#5ee08f;margin-bottom:10px}
+  h1{font-size:68px;font-weight:700;line-height:1.14;letter-spacing:-1px;margin-bottom:16px}
+  .lede{font-size:27px;color:var(--dim);line-height:1.5;max-width:1180px}
+  .pills{display:flex;gap:14px;margin:26px 0 36px}
+  .pill{padding:11px 26px;border-radius:999px;font-size:22px;font-weight:600;border:1.5px solid}
+  .p1{color:#6ee79b;border-color:rgba(110,231,155,.45);background:rgba(110,231,155,.10)}
+  .p2{color:#8ea6ff;border-color:rgba(142,166,255,.45);background:rgba(142,166,255,.10)}
+  .p3{color:#e6e9f5;border-color:rgba(230,233,245,.32);background:rgba(255,255,255,.07)}
+
+  /* ---- body ---- */
+  .body{display:flex;gap:44px}
+  .features{width:812px;display:flex;flex-direction:column;gap:19px}
+  .feat{display:flex;gap:20px;align-items:flex-start}
+  .ico{width:62px;height:62px;border-radius:17px;flex:none;display:flex;align-items:center;justify-content:center;
+       border:1.5px solid rgba(255,255,255,.14)}
+  .ico svg{width:31px;height:31px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+  .feat h3{font-size:27px;font-weight:700;line-height:1.28;margin-bottom:3px}
+  .feat p{font-size:21px;color:var(--dim);line-height:1.42}
+
+  /* ---- app mock ---- */
+  .mockwrap{flex:1;display:flex;flex-direction:column;gap:22px;padding-top:4px}
+  .menubar{background:rgba(10,14,32,.82);border:1px solid rgba(255,255,255,.12);border-radius:16px;
+           padding:13px 20px;display:flex;align-items:center;gap:16px;font-size:21px;font-weight:600;
+           font-family:'Inter',sans-serif}
+  .mb-chip{display:flex;align-items:center;gap:8px;color:rgba(255,255,255,.88)}
+  .mb-dot{width:11px;height:11px;border-radius:50%}
+  .win{background:linear-gradient(170deg,rgba(32,27,64,.96),rgba(22,25,52,.96));
+       border:1px solid rgba(255,255,255,.15);border-radius:22px;overflow:hidden;flex:1;
+       box-shadow:0 30px 70px rgba(0,0,0,.45);display:flex;flex-direction:column}
+  .titlebar{height:46px;display:flex;align-items:center;padding:0 18px;gap:9px;
+            border-bottom:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.05)}
+  .tdot{width:13px;height:13px;border-radius:50%;background:rgba(255,255,255,.26)}
+  .winbody{display:flex;flex:1}
+  .side{width:188px;border-right:1px solid rgba(255,255,255,.09);padding:17px 14px;background:rgba(0,0,0,.18)}
+  .brandrow{display:flex;align-items:center;gap:10px;margin-bottom:5px}
+  .brandrow .m{width:34px;height:34px;border-radius:10px;background:linear-gradient(145deg,var(--brand-a),var(--brand-b));
+               display:flex;align-items:center;justify-content:center}
+  .brandrow .m svg{width:21px;height:21px}
+  .bname{font-family:'Inter',sans-serif;font-weight:800;font-size:20px;line-height:1}
+  .bsub{font-size:13px;color:var(--dimmer);margin-top:2px}
+  .donate{margin:14px 0 18px;display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:600;
+          padding:6px 14px;border-radius:999px;background:linear-gradient(135deg,var(--brand-a),var(--brand-b));color:#fff}
+  .filt{font-size:16px;color:var(--dim);padding:8px 10px;border-radius:8px;display:flex;justify-content:space-between}
+  .filt.on{background:rgba(255,255,255,.12);color:#fff;font-weight:600}
+  .list{flex:1;padding:16px 18px;display:flex;flex-direction:column;gap:15px}
+  .item{background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.08);border-radius:13px;padding:14px 16px}
+  .iname{font-size:18px;font-weight:600;margin-bottom:9px;display:flex;align-items:center;gap:9px}
+  .bar{height:7px;border-radius:4px;background:rgba(255,255,255,.12);overflow:hidden;margin-bottom:9px}
+  .bar i{display:block;height:100%;border-radius:4px}
+  .statusbar{margin-top:auto;padding-top:13px;border-top:1px solid rgba(255,255,255,.09);
+             display:flex;gap:18px;align-items:center;font-size:15px;color:var(--dim);
+             font-family:'Inter',sans-serif}
+  .meta{font-size:15px;color:var(--dim);display:flex;gap:9px;align-items:center;font-family:'Inter',sans-serif}
+  .sdot{width:9px;height:9px;border-radius:50%;flex:none}
+
+  /* ---- scope note ---- */
+  .note{margin:30px 0 0;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.13);
+        border-radius:20px;padding:22px 28px;display:flex;gap:22px;align-items:flex-start}
+  .note .ico{width:56px;height:56px;border-radius:15px}
+  .note h3{font-size:26px;font-weight:700;margin-bottom:6px}
+  .note p{font-size:20px;color:var(--dim);line-height:1.45}
+
+  /* ---- cta ---- */
+  .cta{margin-top:22px;background:rgba(255,255,255,.065);border:1px solid rgba(255,255,255,.15);
+       border-radius:24px;padding:26px 34px;display:flex;align-items:center;gap:30px}
+  .cta h2{font-size:40px;font-weight:700;line-height:1.1;margin-bottom:8px}
+  .url{font-family:'Inter',sans-serif;font-size:30px;font-weight:700;color:#8ea6ff;letter-spacing:-.4px}
+  .req{font-size:19px;color:var(--dimmer);margin-top:8px}
+  .qr{width:142px;height:142px;border-radius:15px;background:#fff;padding:9px;flex:none}
+  .qr img{width:100%;height:100%;display:block}
+  .qrlabel{font-size:17px;color:var(--dim);text-align:center;margin-top:8px}
+
+  .fb{margin-top:18px;background:linear-gradient(100deg,rgba(24,119,242,.26),rgba(24,119,242,.10));
+      border:1px solid rgba(96,165,250,.45);border-radius:20px;padding:20px 30px;display:flex;align-items:center;gap:22px}
+  .fbico{width:58px;height:58px;border-radius:15px;background:#1877F2;display:flex;align-items:center;justify-content:center;flex:none}
+  .fbico svg{width:32px;height:32px;fill:#fff}
+  .fb h3{font-size:25px;font-weight:700;margin-bottom:3px}
+  .fb .handle{font-family:'Inter',sans-serif;font-size:24px;font-weight:700;color:#93c5fd}
+  .fb p{font-size:19px;color:var(--dim);margin-top:3px}
+  .fbqr{width:96px;height:96px;background:#fff;border-radius:14px;padding:7px;margin-left:auto;flex:none}
+  .fbqr img{width:100%;height:100%;display:block}
+
+  footer{margin-top:18px;text-align:center;font-size:18px;color:var(--dimmer);font-family:'Inter',sans-serif}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="mark">
+    <svg viewBox="0 0 100 100"><path fill="#fff" fill-rule="evenodd"
+      d="M50 4 L10.2 27 L10.2 73 L50 96 L89.8 73 L89.8 27 Z
+         M41.26 25.6 L58.74 25.6 L58.74 52.53 L73.92 52.53 L50 78.06 L26.08 52.53 L41.26 52.53 Z"/></svg>
+  </div>
+  <div>
+    <div class="wordmark">BITT</div>
+    <div class="sub">เวอร์ชัน <b>1.0.4</b> · โปรแกรมโหลดบิตสำหรับ Mac</div>
+  </div>
+</header>
+
+<div class="eyebrow">เบื่อโปรแกรมโหลดบิตที่มีโฆษณาและปุ่มขาย Pro?</div>
+<h1>โหลดบิตบน Mac แบบไม่ต้องลงอะไรเพิ่ม</h1>
+<div class="lede">ไฟล์เดียว 3.5 MB อยู่บนเมนูบาร์ ปิดหน้าต่างแล้วยัง seed ต่อให้เงียบๆ<br>เขียนด้วย Swift ล้วน ไม่มี dependency ของใครเลยสักตัว</div>
+
+<div class="pills">
+  <div class="pill p1">ฟรี 100%</div>
+  <div class="pill p2">Open Source</div>
+  <div class="pill p3">Notarized โดย Apple</div>
+</div>
+
+<div class="body">
+  <div class="features">
+    <div class="feat">
+      <div class="ico" style="background:rgba(64,140,255,.17);color:#6ba6ff"><svg viewBox="0 0 24 24"><path d="M12 3v11m0 0l-4-4m4 4l4-4"/><path d="M4 16v2a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3v-2"/></svg></div>
+      <div><h3>รับได้ทั้ง .torrent · magnet · URL</h3>
+      <p>ดับเบิลคลิกไฟล์ วางลิงก์ หรือใส่ URL ที่ชี้ไปหา .torrent ก็ได้</p></div>
+    </div>
+    <div class="feat">
+      <div class="ico" style="background:rgba(46,199,112,.17);color:#5fdc93"><svg viewBox="0 0 24 24"><rect x="2.5" y="4.5" width="19" height="15" rx="2.6"/><path d="M2.5 9h19"/><circle cx="18" cy="6.7" r="1" fill="currentColor" stroke="none"/></svg></div>
+      <div><h3>อยู่บนเมนูบาร์ ไม่กินที่</h3>
+      <p>ปิดหน้าต่างไปเลย มันยัง seed ให้อยู่เบื้องหลัง คลิกไอคอนดูสถานะได้ตลอด</p></div>
+    </div>
+    <div class="feat">
+      <div class="ico" style="background:rgba(41,184,163,.17);color:#4fd4c2"><svg viewBox="0 0 24 24"><path d="M12 3l7.5 3v5.6c0 4.3-3.1 7.6-7.5 8.9-4.4-1.3-7.5-4.6-7.5-8.9V6L12 3z"/><path d="M8.8 12.2l2.3 2.3 4.1-4.6"/></svg></div>
+      <div><h3>ตรวจ SHA-1 ทุกชิ้นก่อนลงดิสก์</h3>
+      <p>ชิ้นไหนพังโหลดใหม่ให้เอง ปิดแอปแล้วเปิดใหม่ก็ไล่เช็กของเดิมต่อได้</p></div>
+    </div>
+    <div class="feat">
+      <div class="ico" style="background:rgba(250,173,46,.17);color:#f5bd5c"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="7.5"/><path d="M12 13l4-3.6"/><path d="M4.5 13h1.6M17.9 13h1.6M12 5.5v1.6"/></svg></div>
+      <div><h3>จำกัดความเร็วได้ทั้งขึ้นและลง</h3>
+      <p>แชร์เพดานร่วมกันทุก torrent จะได้ไม่แย่งเน็ตคนอื่นในบ้าน</p></div>
+    </div>
+    <div class="feat">
+      <div class="ico" style="background:rgba(163,107,250,.17);color:#b48dfb"><svg viewBox="0 0 24 24"><path d="M3 17.5l5.6-5.6 3.4 3.4 7-7"/><path d="M15 8.3h4v4"/><path d="M3 21h18"/></svg></div>
+      <div><h3>Ratio สะสมข้ามการปิดเปิด</h3>
+      <p>นับยอดที่แชร์ออกไปจริงๆ ไม่รีเซ็ตทุกครั้งที่เปิดแอปใหม่</p></div>
+    </div>
+    <div class="feat">
+      <div class="ico" style="background:rgba(64,140,255,.17);color:#6ba6ff"><svg viewBox="0 0 24 24"><path d="M3.5 9.2a12 12 0 0 1 17 0"/><path d="M6.8 12.6a7.4 7.4 0 0 1 10.4 0"/><path d="M10.1 16a2.8 2.8 0 0 1 3.8 0"/><circle cx="12" cy="19.4" r="1" fill="currentColor" stroke="none"/></svg></div>
+      <div><h3>ขอเปิดพอร์ตให้อัตโนมัติ</h3>
+      <p>ลอง NAT-PMP ก่อน ไม่ได้ค่อยลอง UPnP และถ้าเราเตอร์ไม่ยอมก็บอกตรงๆ</p></div>
+    </div>
+    <div class="feat">
+      <div class="ico" style="background:rgba(46,199,112,.17);color:#5fdc93"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="11" height="11" rx="2.4"/><rect x="10" y="10" width="11" height="11" rx="2.4"/></svg></div>
+      <div><h3>เล็กจริง 3.5 MB</h3>
+      <p>ไม่ต้องลง Java ไม่ต้องลง runtime อะไรทั้งนั้น ลากใส่ Applications จบ</p></div>
+    </div>
+    <div class="feat">
+      <div class="ico" style="background:rgba(163,107,250,.17);color:#b48dfb"><svg viewBox="0 0 24 24"><rect x="2.8" y="4.5" width="18.4" height="15" rx="3"/><path d="M12 4.5v15"/><path d="M2.8 10.4h18.4"/></svg></div>
+      <div><h3>Liquid Glass บน macOS 26</h3>
+      <p>ต่ำกว่านั้นใช้วัสดุเดิมของระบบ ไม่พังและไม่หน้าตาแปลก</p></div>
+    </div>
+  </div>
+
+  <div class="mockwrap">
+    <div class="menubar">
+      <div class="mb-chip"><span class="mb-dot" style="background:var(--down)"></span>2.4 MB/s</div>
+      <div class="mb-chip"><span class="mb-dot" style="background:var(--seed)"></span>340 KB/s</div>
+      <div style="margin-left:auto;width:26px;height:26px;border-radius:8px;background:linear-gradient(145deg,var(--brand-a),var(--brand-b));display:flex;align-items:center;justify-content:center">
+        <svg viewBox="0 0 100 100" style="width:17px;height:17px"><path fill="#fff" fill-rule="evenodd"
+        d="M50 4 L10.2 27 L10.2 73 L50 96 L89.8 73 L89.8 27 Z
+           M41.26 25.6 L58.74 25.6 L58.74 52.53 L73.92 52.53 L50 78.06 L26.08 52.53 L41.26 52.53 Z"/></svg>
+      </div>
+    </div>
+
+    <div class="win">
+      <div class="titlebar"><div class="tdot"></div><div class="tdot"></div><div class="tdot"></div></div>
+      <div class="winbody">
+        <div class="side">
+          <div class="brandrow">
+            <div class="m"><svg viewBox="0 0 100 100"><path fill="#fff" fill-rule="evenodd"
+              d="M50 4 L10.2 27 L10.2 73 L50 96 L89.8 73 L89.8 27 Z
+                 M41.26 25.6 L58.74 25.6 L58.74 52.53 L73.92 52.53 L50 78.06 L26.08 52.53 L41.26 52.53 Z"/></svg></div>
+            <div><div class="bname">BITT</div><div class="bsub">BitTorrent</div></div>
+          </div>
+          <div class="donate">♡ Donate</div>
+          <div class="filt on">ทั้งหมด <span>4</span></div>
+          <div class="filt">กำลังโหลด <span>1</span></div>
+          <div class="filt">กำลังแชร์ <span>1</span></div>
+          <div class="filt">เสร็จแล้ว <span>1</span></div>
+          <div class="filt">หยุดไว้ <span>1</span></div>
+        </div>
+        <div class="list">
+          <div class="item">
+            <div class="iname">debian-13.7-amd64-netinst.iso</div>
+            <div class="bar"><i style="width:68%;background:var(--down)"></i></div>
+            <div class="meta"><span class="sdot" style="background:var(--down)"></span>Downloading · 68.4% · 2.4 MB/s · 18 peers</div>
+          </div>
+          <div class="item">
+            <div class="iname">ubuntu-24.04.3-desktop-amd64.iso</div>
+            <div class="bar"><i style="width:100%;background:var(--seed)"></i></div>
+            <div class="meta"><span class="sdot" style="background:var(--seed)"></span>Seeding · ratio 2.41 · 340 KB/s</div>
+          </div>
+          <div class="item">
+            <div class="iname">Fedora-Workstation-41-x86_64.iso</div>
+            <div class="bar"><i style="width:100%;background:var(--done)"></i></div>
+            <div class="meta"><span class="sdot" style="background:var(--done)"></span>Finished · 2.1 GB</div>
+          </div>
+          <div class="item">
+            <div class="iname">archlinux-2025.10.01-x86_64.iso</div>
+            <div class="bar"><i style="width:34%;background:var(--pause)"></i></div>
+            <div class="meta"><span class="sdot" style="background:var(--pause)"></span>Paused · 34.2% · 1.2 GB of 3.5 GB</div>
+          </div>
+          <div class="statusbar">
+            <span><b style="color:var(--down)">↓</b> 2.4 MB/s</span>
+            <span><b style="color:var(--seed)">↑</b> 340 KB/s</span>
+            <span style="margin-left:auto">พอร์ต 51413</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="note">
+  <div class="ico" style="background:rgba(250,173,46,.16);color:#f5bd5c"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.4"/><circle cx="12" cy="12" r="4.4"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/></svg></div>
+  <div>
+    <h3>ตั้งใจทำมาเล็ก — ไม่มี DHT และ PEX</h3>
+    <p>ทำมาเพื่อคนที่มีเว็บโหลดอยู่แล้ว จึงไม่ใส่ DHT/PEX เพราะ private tracker เขาห้าม<br>แลกกับข้อเดียว: magnet เปล่าที่ไม่มี tracker ติดมาจะใช้ไม่ได้ ซึ่งแอปบอกตั้งแต่ตอนกดเพิ่ม</p>
+  </div>
+</div>
+
+<div class="cta">
+  <div style="flex:1">
+    <h2>ดาวน์โหลดฟรี</h2>
+    <div class="url">ninjait07.github.io/bitt</div>
+    <div class="req">macOS 13 ขึ้นไป · Apple Silicon · ไม่เก็บข้อมูล · ไม่มีโฆษณา</div>
+  </div>
+  <div>
+    <div class="qr"><img src="qr-site.png" alt=""></div>
+    <div class="qrlabel">สแกนเลย</div>
+  </div>
+</div>
+
+<div class="fb">
+  <div class="fbico"><svg viewBox="0 0 24 24"><path d="M24 12.07C24 5.4 18.63 0 12 0S0 5.4 0 12.07C0 18.1 4.39 23.1 10.13 24v-8.44H7.08v-3.49h3.05V9.41c0-3.02 1.79-4.69 4.53-4.69 1.31 0 2.68.24 2.68.24v2.97h-1.51c-1.49 0-1.95.93-1.95 1.88v2.26h3.32l-.53 3.49h-2.79V24C19.61 23.1 24 18.1 24 12.07z"/></svg></div>
+  <div>
+    <h3>ติดตามเพจ เผื่อมีอัปเดตใหม่</h3>
+    <div class="handle">facebook.com/nondev07</div>
+    <p>ติดตรงไหน อยากได้อะไรเพิ่ม ทักมาบอกได้เลยครับ</p>
+  </div>
+  <div class="fbqr"><img src="qr-fb.png" alt=""></div>
+</div>
+
+<footer>Open source บน GitHub: github.com/ninjait07/bitt · Crafted by Ninjait07 🇹🇭</footer>
+
+</body>
+</html>
