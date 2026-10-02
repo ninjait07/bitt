@@ -55,7 +55,11 @@ properly, then PEX, then DHT.
 
 ## Install
 
-No notarised release yet, so build it:
+Download **BITT-1.0.dmg** from [Releases](https://github.com/ninjait07/bitt/releases/latest),
+open it, and drag BITT to Applications. It is signed with a Developer ID and
+notarised by Apple, so it opens without a security warning.
+
+Or build it yourself:
 
 ```bash
 git clone https://github.com/ninjait07/bitt.git
@@ -65,7 +69,8 @@ bash macapp/build.sh --install
 
 Needs Xcode Command Line Tools. The build compiles the app, draws the icon, writes
 the bundle and copies it to `/Applications`. `--dmg` writes a disk image to `dist/`,
-and `--out <dir>` puts it somewhere else.
+and `--out <dir>` puts it somewhere else. `./release.sh <version>` does the signed,
+notarised, stapled build that goes out as a release.
 
 ## Layout
 
@@ -111,8 +116,8 @@ failed pieces.
 - No DHT or PEX — see **Scope** above
 - No connection encryption (MSE/PE), so some ISPs may throttle
 - No BitTorrent v2 (`btmh:` magnets)
-- Builds are ad-hoc signed; copying the app between machines trips Gatekeeper until
-  it is signed with a Developer ID and notarised
+- Releases are signed and notarised; a local `build.sh` build is ad-hoc signed and
+  will trip Gatekeeper if copied to another machine
 
 ## Licence
 

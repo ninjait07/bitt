@@ -3,6 +3,8 @@
 #   --install    also copy it into /Applications
 #   --dmg        also write a disk image to keep
 #   --out <dir>  where the disk image goes (default: dist/ next to this project)
+#   --release    sign with the Developer ID and the hardened runtime, ready to
+#                notarise (release.sh drives this)
 set -euo pipefail
 
 APP_NAME="BITT"
@@ -18,11 +20,13 @@ CONTENTS="$APP/Contents"
 
 INSTALL=0
 MAKE_DMG=0
+RELEASE=0
 DMG_DIR=""
 while [ $# -gt 0 ]; do
     case "$1" in
         --install) INSTALL=1 ;;
         --dmg) MAKE_DMG=1 ;;
+        --release) RELEASE=1 ;;
         --out)
             shift
             DMG_DIR="${1:?--out needs a directory}"
@@ -122,9 +126,23 @@ PLIST
 
 printf 'APPL????' > "$CONTENTS/PkgInfo"
 
-echo "==> Signing (ad-hoc, for this machine)"
-codesign --force --deep --sign - "$APP" 2>/dev/null || \
-    echo "    note: ad-hoc signing failed; the app still runs locally"
+if [ "$RELEASE" = "1" ]; then
+    IDENTITY="$(security find-identity -v -p codesigning \
+        | grep "Developer ID Application" | head -1 | sed -E 's/.*"(.*)".*/\1/')"
+    if [ -z "$IDENTITY" ]; then
+        echo "==> No Developer ID found; cannot build a release" >&2
+        exit 1
+    fi
+    echo "==> Signing as $IDENTITY (hardened runtime, for notarisation)"
+    # No --deep: it is deprecated, and this bundle has nothing nested to sign.
+    codesign --force --identifier "$BUNDLE_ID" --sign "$IDENTITY" \
+        --options runtime --timestamp "$APP"
+    codesign --verify --strict "$APP"
+else
+    echo "==> Signing (ad-hoc, for this machine)"
+    codesign --force --sign - "$APP" 2>/dev/null || \
+        echo "    note: ad-hoc signing failed; the app still runs locally"
+fi
 
 echo "==> Built $APP"
 
