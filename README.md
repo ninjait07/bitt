@@ -55,7 +55,7 @@ properly, then PEX, then DHT.
 
 ## Install
 
-Download **BITT-1.0.dmg** from [Releases](https://github.com/ninjait07/bitt/releases/latest),
+Download the latest **.dmg** from [Releases](https://github.com/ninjait07/bitt/releases/latest),
 open it, and drag BITT to Applications. It is signed with a Developer ID and
 notarised by Apple, so it opens without a security warning.
 

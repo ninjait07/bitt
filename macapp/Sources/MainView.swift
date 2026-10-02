@@ -99,7 +99,7 @@ struct MainView: View {
             filterRow(item).tag(item)
         }
         .listStyle(.sidebar)
-        .navigationSplitViewColumnWidth(min: 186, ideal: 200, max: 260)
+        .navigationSplitViewColumnWidth(min: 200, ideal: 212, max: 280)
         .safeAreaInset(edge: .top, spacing: 0) { brandHeader }
         .safeAreaInset(edge: .bottom, spacing: 0) { rateSummary }
     }
@@ -111,9 +111,11 @@ struct MainView: View {
                 Text("BITT").font(.headline)
                 Text("BitTorrent").font(.caption2).foregroundStyle(.secondary)
             }
-            Spacer()
+            Spacer(minLength: 6)
+            DonateButton()
         }
-        .padding(.horizontal, 14)
+        .padding(.leading, 14)
+        .padding(.trailing, 10)
         .padding(.top, 12)
         .padding(.bottom, 10)
     }
@@ -507,6 +509,39 @@ struct RemoveSheet: View {
         }
         .padding(20)
         .frame(width: 440)
+    }
+}
+
+/// Quiet by default, warm on hover. BITT is free, so this asks rather than sells.
+struct DonateButton: View {
+    @State private var hovering = false
+
+    var body: some View {
+        Button {
+            AboutWindow.shared.present()
+        } label: {
+            HStack(spacing: 6) {
+                Image(systemName: hovering ? "heart.fill" : "heart")
+                    .font(.system(size: 10))
+                Text("Donate")
+                    .font(.system(size: 11, weight: .medium))
+                    .lineLimit(1)
+                    .fixedSize()
+            }
+            .foregroundStyle(hovering ? Color.white : Color.secondary)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 5)
+            .background(
+                Capsule().fill(hovering ? Theme.brandStart : Color.clear)
+            )
+            .overlay(
+                Capsule().strokeBorder(hovering ? Color.clear : Color.primary.opacity(0.18))
+            )
+            .contentShape(Capsule())
+        }
+        .buttonStyle(.plain)
+        .onHover { hovering = $0 }
+        .help("About BITT, and how to support it")
     }
 }
 

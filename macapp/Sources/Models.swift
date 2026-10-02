@@ -63,7 +63,12 @@ struct TorrentState: Identifiable, Hashable {
         return Double(total - done) / downloadRate
     }
 
+    /// Verifying a large torrent takes a while, and during it the byte count is
+    /// zero. Without its own state that reads as "your files are gone".
+    static let checkingState = "checking existing files"
+
     var activity: Activity {
+        if state == TorrentState.checkingState { return .checking }
         if paused && complete { return .finished }
         if paused { return .paused }
         if complete { return state == "seeding" ? .seeding : .finished }
@@ -72,10 +77,11 @@ struct TorrentState: Identifiable, Hashable {
     }
 
     enum Activity: String {
-        case downloading, seeding, paused, finished, metadata
+        case downloading, seeding, paused, finished, metadata, checking
 
         var symbol: String {
             switch self {
+            case .checking: return "arrow.triangle.2.circlepath.circle.fill"
             case .downloading: return "arrow.down.circle.fill"
             case .seeding: return "arrow.up.circle.fill"
             case .paused: return "pause.circle.fill"
@@ -86,6 +92,7 @@ struct TorrentState: Identifiable, Hashable {
 
         var label: String {
             switch self {
+            case .checking: return "Checking files"
             case .downloading: return "Downloading"
             case .seeding: return "Seeding"
             case .paused: return "Paused"

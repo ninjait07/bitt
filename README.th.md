@@ -6,8 +6,8 @@
 
 ไบนารีเดียว ~3.4 MB ไม่ต้องพึ่ง Python ของเครื่อง ไม่ต้องติดตั้งอะไรเพิ่มเลย
 
-**ไฟล์ติดตั้งอยู่ที่ `~/BANNAWAT/SOFTWARE/BITT-1.0.dmg`** — ดับเบิลคลิกแล้วลาก BITT ไปใส่ Applications
-ใช้ติดตั้งใหม่หรือย้ายไปเครื่องอื่นได้เลย
+**โหลดไฟล์ติดตั้งได้ที่ [Releases](https://github.com/ninjait07/bitt/releases/latest)** —
+ดับเบิลคลิกแล้วลาก BITT ไปใส่ Applications เซ็นและ notarize จาก Apple แล้ว เปิดได้เลยไม่มีคำเตือน
 
 ## อยู่บน menu bar
 
@@ -132,7 +132,7 @@ BITT ทำมาเพื่อ **คนที่มีเว็บ torrent ใ
 
 ```bash
 cd <โฟลเดอร์โปรเจกต์>
-bash macapp/build.sh --install --out ~/BANNAWAT/SOFTWARE   # ติดตั้ง + ทำ dmg ไว้ที่นั่น
+bash macapp/build.sh --install --out <โฟลเดอร์ที่ต้องการ>   # ติดตั้ง + ทำ dmg ไว้ที่นั่น
 bash macapp/build.sh --install --dmg   # คอมไพล์ + ติดตั้ง + ทำไฟล์ dist/BITT-1.0.dmg
 bash macapp/build.sh --install         # ติดตั้งอย่างเดียว
 bash macapp/build.sh --dmg             # ทำไฟล์ติดตั้งอย่างเดียว

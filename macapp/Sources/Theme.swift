@@ -70,6 +70,7 @@ extension TorrentState.Activity {
         case .paused: return Theme.paused
         case .finished: return Theme.finished
         case .metadata: return Theme.metadata
+        case .checking: return Theme.metadata
         }
     }
 }

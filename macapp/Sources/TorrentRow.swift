@@ -51,7 +51,11 @@ struct TorrentRow: View {
                 .foregroundStyle(tint)
                 .fontWeight(.medium)
 
-            if torrent.hasMetadata {
+            if torrent.activity == .checking {
+                dot
+                Text("this can take a minute on a large torrent")
+                    .foregroundStyle(.secondary)
+            } else if torrent.hasMetadata {
                 dot
                 Text("\(Format.bytes(torrent.done)) of \(Format.bytes(torrent.total))")
                     .foregroundStyle(.secondary)
