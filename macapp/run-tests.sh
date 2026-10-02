@@ -79,6 +79,7 @@ PY
 echo "==> Compiling the Swift engine and its tests"
 swiftc -O -target arm64-apple-macos13.0 -o "$OUT" \
     "$HERE"/Sources/Engine/*.swift \
+    "$HERE"/Sources/Migration.swift "$HERE"/Sources/AppLog.swift \
     "$HERE"/EngineTests/*.swift
 
 echo "==> Starting a Python seeder for the cross-check"

@@ -15,6 +15,7 @@ StorageTests.run(fixtures: fixtures)
 TrackerTests.run(fixtures: fixtures)
 
 StateTests.run()
+MigrationTests.run()
 await RateLimiterTests.run()
 
 if let fixtures {

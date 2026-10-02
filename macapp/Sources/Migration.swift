@@ -7,35 +7,48 @@ import Foundation
 /// This works file by file rather than moving the whole folder: the engine may
 /// already have created its own folder before this runs, and the old one is
 /// left in place as a safety net.
+///
+/// It must happen exactly once, at the moment of the rename. An earlier version
+/// decided by asking whether BITT's list was empty, which is not the same
+/// question: delete every torrent and the list is empty too, so the next launch
+/// read that as "not migrated yet" and copied the whole old list back. Removed
+/// torrents kept coming back. Now a marker file records that the migration has
+/// been considered, and the list is only carried when BITT has never written a
+/// state file of its own.
 enum Migration {
     private static let oldName = "Swarm"
     private static let newName = "BITT"
-    private static let oldBundleID = "com.bannawat.swarm"
+    private static let markerName = ".migrated-from-swarm"
 
-    static func runIfNeeded() {
-        let support = FileManager.default.homeDirectoryForCurrentUser
-            .appendingPathComponent("Library/Application Support")
-        carryState(from: support.appendingPathComponent(oldName),
-                   to: support.appendingPathComponent(newName))
-        copyPreferences()
-    }
-
-    private static func carryState(from old: URL, to new: URL) {
+    /// Carries the list across if this is the first launch under the new name.
+    /// Returns whether anything was actually copied. `support` is a parameter so
+    /// the tests can run the whole thing inside a temporary directory.
+    @discardableResult
+    static func carryState(in support: URL,
+                           log: (String) -> Void = { AppLog.write($0) }) -> Bool {
         let manager = FileManager.default
-        guard manager.fileExists(atPath: old.path) else { return }
+        let old = support.appendingPathComponent(oldName)
+        let new = support.appendingPathComponent(newName)
+        let marker = new.appendingPathComponent(markerName)
+
+        // Asked and answered, whatever the answer was.
+        guard !manager.fileExists(atPath: marker.path) else { return false }
+        defer { leaveMarker(at: marker, in: new) }
+
+        guard manager.fileExists(atPath: old.path) else { return false }
 
         let oldState = old.appendingPathComponent("state.json")
         let newState = new.appendingPathComponent("state.json")
-        guard manager.fileExists(atPath: oldState.path), listsTorrents(oldState) else { return }
-        // Never overwrite a list that already has something in it.
-        guard !listsTorrents(newState) else { return }
+        guard manager.fileExists(atPath: oldState.path), listsTorrents(oldState) else { return false }
+        // BITT has kept its own list at some point, so it is not a fresh rename.
+        // An empty list is a list: it means everything in it was removed.
+        guard !manager.fileExists(atPath: newState.path) else { return false }
 
         try? manager.createDirectory(at: new, withIntermediateDirectories: true)
-        try? manager.removeItem(at: newState)
         do {
             try manager.copyItem(at: oldState, to: newState)
         } catch {
-            return
+            return false
         }
 
         // The cached .torrent files are what the list points at.
@@ -47,7 +60,14 @@ enum Migration {
             guard !manager.fileExists(atPath: target.path) else { continue }
             try? manager.copyItem(at: oldCache.appendingPathComponent(name), to: target)
         }
-        AppLog.write("carried the torrent list over from \(oldName)")
+        log("carried the torrent list over from \(oldName)")
+        return true
+    }
+
+    private static func leaveMarker(at marker: URL, in directory: URL) {
+        let manager = FileManager.default
+        try? manager.createDirectory(at: directory, withIntermediateDirectories: true)
+        try? Data().write(to: marker)
     }
 
     private static func listsTorrents(_ url: URL) -> Bool {
@@ -55,18 +75,5 @@ enum Migration {
               let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
               let torrents = json["torrents"] as? [Any] else { return false }
         return !torrents.isEmpty
-    }
-
-    private static func copyPreferences() {
-        let defaults = UserDefaults.standard
-        // Only on the very first run under the new name.
-        guard defaults.object(forKey: Prefs.hasLaunchedBefore) == nil,
-              let previous = UserDefaults(suiteName: oldBundleID) else { return }
-        for key in [Prefs.showDockIcon, Prefs.askWhereToSave, Prefs.askOnAdd,
-                    Prefs.showDetailPane, Prefs.hasLaunchedBefore] {
-            if let value = previous.object(forKey: key) {
-                defaults.set(value, forKey: key)
-            }
-        }
     }
 }
