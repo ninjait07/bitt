@@ -43,13 +43,24 @@ final class Engine: ObservableObject {
         poller?.cancel()
         poller = nil
         started = false
-        // The app is quitting; give the engine a moment to tell trackers.
+        // The app is quitting; give the engine a moment to tell the trackers.
+        //
+        // This has to be a *detached* task. Engine is @MainActor, so a plain
+        // Task inherits that isolation and cannot start until the main actor is
+        // free — which it never is, because the line below is blocking it. The
+        // engine was never actually shut down on quit: the app simply froze for
+        // the length of the timeout and then exited. A detached task runs on the
+        // cooperative pool and is free to get on with it.
+        let manager = self.manager
         let semaphore = DispatchSemaphore(value: 0)
-        Task {
+        let started = Date()
+        Task.detached {
             await manager.shutdown()
             semaphore.signal()
         }
-        _ = semaphore.wait(timeout: .now() + 4)
+        let finished = semaphore.wait(timeout: .now() + 3)
+        AppLog.write(String(format: "engine stopped in %.2fs%@", -started.timeIntervalSinceNow,
+                            finished == .success ? "" : " (gave up waiting)"))
     }
 
     private func pollLoop() async {

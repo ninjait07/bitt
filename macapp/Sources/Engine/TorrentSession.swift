@@ -481,6 +481,7 @@ actor TorrentSession {
             uploaded: uploaded, downloaded: downloaded, left: bytesLeft, event: event)
         do {
             let response = try await tracker.announce(request)
+            announcedToTrackers = true
             tracker.noteSuccess(response)
             for address in response.peers { addCandidate(address) }
             if !response.warning.isEmpty {
@@ -660,22 +661,60 @@ actor TorrentSession {
         await announceAll(event: .started)
     }
 
+    private var saidGoodbye = false
+    /// Whether a tracker has ever acknowledged this torrent.
+    private var announcedToTrackers = false
+
     nonisolated func stop() {
         Task { await self.shutdown() }
     }
 
     func shutdown() async {
+        await quiesce()
+        await sayGoodbye()
+    }
+
+    /// Everything local: stop the loops, drop the peers, flush and close the
+    /// files. All of it is quick, none of it touches the network, and it leaves
+    /// the torrent in a state where its payload can safely be deleted.
+    func quiesce() async {
         guard !stopped else { return }
         stopped = true
         loops.forEach { $0.cancel() }
         loops.removeAll()
-        await announceAll(event: .stopped)
         for peer in peers.values { await peer.close() }
         if let listener { await listener.unregister(infoHash: infoHash) }
         if let ownListener { await ownListener.close() }
         if let storage { await onDiskVoid { storage.close() } }
         onFinished?()
     }
+
+    /// Telling the trackers we are leaving is a courtesy to the swarm, not
+    /// something the user should have to watch. A tracker that has gone away
+    /// takes 20 seconds over HTTP and 8 over UDP to admit it, which is how
+    /// Remove and Quit came to sit there spinning. The goodbye now gets a
+    /// deadline of its own and whatever has not been sent by then is dropped.
+    func sayGoodbye() async {
+        // A torrent that never told a tracker it was here has nothing to take
+        // back. Most of a paused list is in exactly that position, and quitting
+        // should not stop to send announcements that mean nothing.
+        guard announcedToTrackers else { return }
+        guard !saidGoodbye, !trackers.isEmpty else { return }
+        saidGoodbye = true
+        await withTaskGroup(of: Void.self) { group in
+            group.addTask { await self.announceAll(event: .stopped) }
+            group.addTask {
+                try? await Task.sleep(nanoseconds: TorrentSession.goodbyeDeadline)
+            }
+            await group.next()
+            group.cancelAll()
+        }
+    }
+
+    /// Long enough for a tracker that is still there to answer, short enough
+    /// that one that is not costs nothing worth noticing. A tracker that never
+    /// hears the goodbye simply keeps us listed until its interval runs out.
+    private static let goodbyeDeadline: UInt64 = 500_000_000
 
     func setSeedAfterComplete(_ value: Bool) { seedAfterComplete = value }
     func setMaxPeers(_ value: Int) { maxPeers = value }

@@ -188,9 +188,12 @@ actor TorrentManager {
         ticker?.cancel()
         await portMapper.stop()
         saveState()
-        for entry in entries.values {
-            await entry.session.shutdown()
-            entry.task?.cancel()
+        let sessions = entries.values.map(\.session)
+        for entry in entries.values { entry.task?.cancel() }
+        await withTaskGroup(of: Void.self) { group in
+            for session in sessions {
+                group.addTask { await session.shutdown() }
+            }
         }
         entries.removeAll()
         await listener.close()
@@ -319,14 +322,23 @@ actor TorrentManager {
 
     func remove(_ hash: String, deleteData: Bool) async throws {
         let entry = try self.entry(hash)
-        if deleteData { await entry.session.deletePayload() }
-        await entry.session.shutdown()
+        let session = entry.session
+
+        // Close the local side first: the loops have to be stopped and the
+        // files closed before the payload can be deleted, or a download still
+        // in flight writes them straight back.
+        await session.quiesce()
+        if deleteData { await session.deletePayload() }
+
         entry.task?.cancel()
         entries.removeValue(forKey: hash)
-
         let cached = torrentDirectory.appendingPathComponent(hash + ".torrent")
         try? FileManager.default.removeItem(at: cached)
         saveState()
+
+        // The torrent is gone as far as the user is concerned. Saying goodbye
+        // to its trackers is worth doing, but not worth waiting for.
+        Task.detached { await session.sayGoodbye() }
     }
 
     func update(settings newValue: BittSettings) async {
