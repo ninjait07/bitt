@@ -112,6 +112,11 @@ actor TorrentManager {
         var task: Task<Void, Never>?
         var cachedMetadata = false
         var wasComplete = false
+        /// Mirrored from the session so the state can be built without awaiting
+        /// anything — an await here is what let two saves race each other.
+        var isPaused: Bool
+        var totalDownloaded: Int
+        var totalUploaded: Int
     }
 
     /// One pair of buckets for the whole app, which is how a user thinks about
@@ -264,7 +269,8 @@ actor TorrentManager {
                                      carriedDownloaded: carriedDownloaded,
                                      carriedUploaded: carriedUploaded)
         var entry = Entry(infoHash: hash, source: stored, downloadDirectory: target,
-                          session: session)
+                          session: session, isPaused: paused,
+                          totalDownloaded: carriedDownloaded, totalUploaded: carriedUploaded)
         entry.task = Task { await session.run() }
         entries[hash] = entry
         saveState()
@@ -289,21 +295,25 @@ actor TorrentManager {
 
     func pause(_ hash: String) async throws {
         try await entry(hash).session.pause()
+        entries[hash]?.isPaused = true
         saveState()
     }
 
     func resume(_ hash: String) async throws {
         try await entry(hash).session.resume()
+        entries[hash]?.isPaused = false
         saveState()
     }
 
     func pauseAll() async {
         for entry in entries.values { await entry.session.pause() }
+        for hash in entries.keys { entries[hash]?.isPaused = true }
         saveState()
     }
 
     func resumeAll() async {
         for entry in entries.values { await entry.session.resume() }
+        for hash in entries.keys { entries[hash]?.isPaused = false }
         saveState()
     }
 
@@ -406,22 +416,30 @@ actor TorrentManager {
         ticks += 1
         // The ratio is only as good as the last save, so checkpoint now and then.
         if ticks % 30 == 0 { saveState() }
-        for (hash, var entry) in entries {
+        for hash in Array(entries.keys) {
+            guard var entry = entries[hash] else { continue }
+
             // Once a magnet resolves, write the .torrent so restarts are instant.
             if !entry.cachedMetadata, let meta = await entry.session.meta {
-                if entry.source.hasPrefix("magnet:") {
-                    entry.source = cacheTorrentFile(meta)
-                    saveState()
-                }
+                if entry.source.hasPrefix("magnet:") { entry.source = cacheTorrentFile(meta) }
                 entry.cachedMetadata = true
             }
             let complete = await entry.session.isComplete
-            if complete && !entry.wasComplete {
+            let finishedJustNow = complete && !entry.wasComplete
+            entry.wasComplete = complete
+            entry.isPaused = await entry.session.isPaused
+            entry.totalDownloaded = await entry.session.totalDownloaded
+            entry.totalUploaded = await entry.session.totalUploaded
+
+            // Removing a torrent can land on any of those awaits. Writing the
+            // entry back blindly would bring it straight back from the dead.
+            guard entries[hash] != nil else { continue }
+            entries[hash] = entry
+
+            if finishedJustNow {
                 onFinished?(await entry.session.displayName, await entry.session.savePath)
                 saveState()
             }
-            entry.wasComplete = complete
-            entries[hash] = entry
         }
     }
 
@@ -544,21 +562,23 @@ actor TorrentManager {
         }
     }
 
+    /// Built and written synchronously on the actor. It used to run in a
+    /// detached task that awaited each session, so two saves could finish out of
+    /// order and an older snapshot could land on top of a newer one — bringing
+    /// back a torrent that had just been removed. The file is a few kilobytes.
     private func saveState() {
-        Task { [entries, settings, stateURL] in
-            var stored = StoredState()
-            stored.settings = settings
-            for entry in entries.values {
-                stored.torrents.append(.init(hash: entry.infoHash,
-                                             source: entry.source,
-                                             directory: entry.downloadDirectory.path,
-                                             paused: await entry.session.isPaused,
-                                             downloaded: await entry.session.totalDownloaded,
-                                             uploaded: await entry.session.totalUploaded))
-            }
-            stored.torrents.sort { $0.hash < $1.hash }
-            guard let data = try? JSONEncoder().encode(stored) else { return }
-            try? data.write(to: stateURL, options: .atomic)
+        var stored = StoredState()
+        stored.settings = settings
+        for entry in entries.values {
+            stored.torrents.append(.init(hash: entry.infoHash,
+                                         source: entry.source,
+                                         directory: entry.downloadDirectory.path,
+                                         paused: entry.isPaused,
+                                         downloaded: entry.totalDownloaded,
+                                         uploaded: entry.totalUploaded))
         }
+        stored.torrents.sort { $0.hash < $1.hash }
+        guard let data = try? JSONEncoder().encode(stored) else { return }
+        try? data.write(to: stateURL, options: .atomic)
     }
 }

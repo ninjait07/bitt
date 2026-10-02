@@ -20,6 +20,7 @@ await RateLimiterTests.run()
 if let fixtures {
     await TransferTests.run(fixtures: fixtures)
     await TransferTests.resumeWhilePeersWait(fixtures: fixtures)
+    await ManagerTests.run(fixtures: fixtures)
     if let pythonSeedPort {
         await TransferTests.crossCheck(fixtures: fixtures, pythonSeedPort: pythonSeedPort)
     }

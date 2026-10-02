@@ -37,6 +37,18 @@ struct MenuBarPanel: View {
                     .foregroundStyle(.secondary)
             }
             Spacer()
+
+            Button {
+                AboutWindow.shared.present()
+            } label: {
+                Image(systemName: "info.circle")
+                    .font(.system(size: 13))
+                    .foregroundStyle(.secondary)
+            }
+            .buttonStyle(.plain)
+            .help("About BITT, and how to support it")
+            .padding(.trailing, 2)
+
             VStack(alignment: .trailing, spacing: 1) {
                 Label(Format.rate(engine.totalDownloadRate), systemImage: "arrow.down")
                     .foregroundStyle(engine.totalDownloadRate > 1024

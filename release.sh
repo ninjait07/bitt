@@ -24,7 +24,7 @@ rm -rf "$STAGE" "$DMG"
 mkdir -p "$STAGE"
 
 echo "==> [1/6] Building $APP_NAME $VERSION signed for release"
-bash "$ROOT/macapp/build.sh" --release
+BITT_VERSION="$VERSION" bash "$ROOT/macapp/build.sh" --release
 
 echo "==> [2/6] Notarising the app (Apple usually takes 1–5 minutes)"
 ZIP="$DIST/$APP_NAME-$VERSION.zip"

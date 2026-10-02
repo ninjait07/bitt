@@ -75,6 +75,10 @@ struct BittCommands: Commands {
                 .keyboardShortcut("1")
         }
 
+        CommandGroup(replacing: .appInfo) {
+            Button("About BITT") { AboutWindow.shared.present() }
+        }
+
         CommandGroup(replacing: .help) {
             Button("BITT Help") {
                 if let readme = Bundle.main.url(forResource: "HELP", withExtension: "md") {
