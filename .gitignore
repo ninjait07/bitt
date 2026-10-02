@@ -1,0 +1,22 @@
+# build output
+dist/
+macapp/build/
+*.dmg
+*.iconset
+
+# secrets — nothing here today, but never let one slip in
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# python
+__pycache__/
+*.pyc
+.venv/
+
+# macOS / editors
+.DS_Store
+.vscode/*
+!.vscode/launch.json
