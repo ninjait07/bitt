@@ -81,6 +81,14 @@ cat > "$CONTENTS/Info.plist" <<PLIST
     <key>LSMinimumSystemVersion</key><string>$MIN_MACOS</string>
     <key>LSApplicationCategoryType</key><string>public.app-category.utilities</string>
     <key>NSHighResolutionCapable</key><true/>
+    <!-- Many BitTorrent trackers are plain http:// and always will be. Without
+         this, App Transport Security blocks every one of them and no peers are
+         ever found. Peer and UDP traffic goes through Network.framework and is
+         unaffected either way. -->
+    <key>NSAppTransportSecurity</key>
+    <dict>
+        <key>NSAllowsArbitraryLoads</key><true/>
+    </dict>
     <key>NSLocalNetworkUsageDescription</key>
     <string>BITT asks your router to forward its listening port, so other peers can connect to you.</string>
     <key>NSSupportsAutomaticTermination</key><false/>
